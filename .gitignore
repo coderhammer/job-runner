@@ -1,0 +1,7 @@
+node_modules/
+*.log
+.data/
+.env
+# dist/ est commité volontairement (voir README) : permet la consommation par
+# dépendance git sans build côté consommateur, tant que le paquet n'est pas
+# publié sur un registre npm privé.
