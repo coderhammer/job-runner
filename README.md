@@ -1,4 +1,4 @@
-# @coderhammer/job-runner
+# @hammerbot/job-runner
 
 Déclare des **jobs** (cron ou webhook), obtiens gratuitement : exécution planifiée,
 télémétrie OpenTelemetry (span par job + sous-étapes, persistés en SQLite), un flux
@@ -13,7 +13,7 @@ qui en est désormais le premier consommateur.
 ```ts
 // index.ts — tout le service tient ici
 import "dotenv/config";
-import { start } from "@coderhammer/job-runner";
+import { start } from "@hammerbot/job-runner";
 import { workflows } from "./workflows.js";
 import { myWebhookHandler } from "./jobs/myWebhook.js";
 
@@ -25,7 +25,7 @@ start({
 
 ```ts
 // workflows.ts — le manifest : déclare tes jobs
-import type { WorkflowDefinition } from "@coderhammer/job-runner";
+import type { WorkflowDefinition } from "@hammerbot/job-runner";
 import { runDailyReport } from "./jobs/dailyReport.js";
 
 export const workflows: WorkflowDefinition[] = [
@@ -60,7 +60,7 @@ l'API d'exécutions, `POST /api/workflows/:id/trigger` un déclenchement manuel.
 Un job = **un span racine** (`withSpan`) + **un span enfant par étape externe** (`withChildSpan`).
 
 ```ts
-import { withSpan, withChildSpan } from "@coderhammer/job-runner";
+import { withSpan, withChildSpan } from "@hammerbot/job-runner";
 
 export async function runDailyReport(): Promise<void> {
   await withSpan("daily-report", {}, async (span) => {
@@ -90,22 +90,24 @@ Règles (issues d'incidents réels, à respecter pour un waterfall lisible) :
   (ex. `verifySignature`) throw sans `try/catch` — un throw synchrone dans un handler
   Express async **crashe le process**.
 
-## Modèle de consommation (première implémentation)
+## Installation
 
-Le paquet n'est **pas encore publié sur un registre npm**. En attendant, il se consomme
-par **dépendance git** avec le `dist/` **commité** dans ce repo :
+Publié sur npm (public) :
 
-```json
-{ "dependencies": { "@coderhammer/job-runner": "git+ssh://git@github.com/coderhammer/job-runner.git#<sha>" } }
+```bash
+npm i @hammerbot/job-runner
 ```
 
-Le dashboard prébuildé, les migrations et le serveur compilé voyagent dans `dist/`, donc
-aucune étape de build côté consommateur.
+Le dashboard prébuildé, les migrations et le serveur compilé sont inclus dans le paquet
+(`dist/`, généré au packaging par `prepack`), donc **aucune étape de build côté
+consommateur** — un `npm ci` suffit.
 
-> **Suivi prévu** : publier sur GitHub Packages (registre npm privé) pour remplacer la
-> dépendance git par une version sémantique, et brancher une CI de publication. Voir la
-> PR de migration d'`automations` pour les implications côté Docker/CI (auth du repo privé
-> au `npm ci`).
+### Publier une nouvelle version
+
+Bump `version` dans `package.json`, puis créer une **GitHub Release** : la CI
+(`.github/workflows/release.yml`) publie sur npm (nécessite le secret repo `NPM_TOKEN`,
+un token granulaire *bypass 2FA* — expiration npm max 90 jours, à faire tourner). Publish
+manuel possible aussi : `npm publish --access public` avec un token équivalent.
 
 ## Développer le dashboard
 

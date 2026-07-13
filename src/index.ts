@@ -1,4 +1,4 @@
-// Surface publique de @coderhammer/job-runner.
+// Surface publique de @hammerbot/job-runner.
 //
 // Un consommateur déclare des jobs (WorkflowDefinition[]) + éventuellement des
 // webhooks, et appelle start(). Il obtient : exécution cron/webhook, télémétrie

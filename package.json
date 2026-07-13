@@ -1,5 +1,5 @@
 {
-  "name": "@coderhammer/job-runner",
+  "name": "@hammerbot/job-runner",
   "version": "0.1.0",
   "description": "Déclare des jobs (cron/webhook), obtiens télémétrie OpenTelemetry + dashboard. Extrait de coderhammer/automations.",
   "type": "module",

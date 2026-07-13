@@ -1,8 +1,8 @@
 name: release
 
-# Publie @coderhammer/job-runner sur npm à chaque GitHub Release publiée.
+# Publie @hammerbot/job-runner sur npm à chaque GitHub Release publiée.
 # Prérequis : un secret repo `NPM_TOKEN` (npm automation token du compte/org
-# propriétaire du scope @coderhammer). Le build (dist/ : serveur compilé +
+# propriétaire du scope @hammerbot). Le build (dist/ : serveur compilé +
 # dashboard Vite + migrations) est régénéré par le script `prepack` au packaging,
 # donc rien n'est bundlé à la main.
 on:
