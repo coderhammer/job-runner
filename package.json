@@ -3,8 +3,29 @@
   "version": "0.1.0",
   "description": "Déclare des jobs (cron/webhook), obtiens télémétrie OpenTelemetry + dashboard. Extrait de coderhammer/automations.",
   "type": "module",
+  "license": "MIT",
+  "author": "coderhammer",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/coderhammer/job-runner.git"
+  },
+  "homepage": "https://github.com/coderhammer/job-runner#readme",
+  "bugs": "https://github.com/coderhammer/job-runner/issues",
+  "keywords": [
+    "cron",
+    "jobs",
+    "scheduler",
+    "webhook",
+    "opentelemetry",
+    "telemetry",
+    "dashboard",
+    "observability"
+  ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
