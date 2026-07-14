@@ -65,11 +65,11 @@ import { withSpan, withChildSpan } from "@hammerbot/job-runner";
 export async function runDailyReport(): Promise<void> {
   await withSpan("daily-report", {}, async (span) => {
     const data = await withChildSpan(span, "fetch-data", {}, fetchData);
-    await withChildSpan(span, "post-slack", {}, async (postSpan) => {
-      const channel = process.env.SLACK_CHANNEL;
-      if (!channel) throw new Error("SLACK_CHANNEL manquant");
-      postSpan.setAttribute("slack.channel", channel);
-      await postSlackMessage(channel, format(data));
+    await withChildSpan(span, "post-mattermost", {}, async (postSpan) => {
+      const channel = process.env.MATTERMOST_CHANNEL;
+      if (!channel) throw new Error("MATTERMOST_CHANNEL manquant");
+      postSpan.setAttribute("mattermost.channel", channel);
+      await postMattermostMessage(channel, format(data));
     });
   });
 }
