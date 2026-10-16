@@ -61,14 +61,14 @@ export function ExecutionsTable({
           placeholder="Rechercher un job, un attribut…"
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="min-w-[200px] max-w-xs flex-1 text-xs"
+          className="w-full text-xs sm:w-auto sm:min-w-[200px] sm:max-w-xs sm:flex-1"
         />
         <OptionSelect
           aria-label="Filtrer par job"
           value={jobFilter}
           onValueChange={onJobFilterChange}
           options={[{ value: "", label: "Tous les jobs" }, ...knownJobs.map((j) => ({ value: j, label: j }))]}
-          className="w-auto min-w-[160px]"
+          className="w-auto min-w-[160px] flex-1 sm:flex-none"
         />
         <div className="inline-flex gap-0.5 rounded-lg border border-border bg-card p-0.5">
           {STATUS_PILLS.map((p) => (
@@ -93,17 +93,18 @@ export function ExecutionsTable({
             <TableRow className="text-[11px] uppercase tracking-wide">
               <TableHead>Job</TableHead>
               <TableHead>Statut</TableHead>
-              <TableHead>Démarré</TableHead>
+              <TableHead className="hidden sm:table-cell">Démarré</TableHead>
               <TableHead>Durée</TableHead>
-              <TableHead>Résumé</TableHead>
+              <TableHead className="hidden md:table-cell">Résumé</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {records.map((r) => (
               <TableRow key={r.id} data-state={r.id === selectedRecordId ? "selected" : undefined}>
-                <TableCell className="p-0">
-                  <Link to="/executions" search={{ open: r.id }} className="block p-2 font-medium text-primary hover:underline">
+                <TableCell className="w-full max-w-0 p-0 sm:w-auto sm:max-w-none">
+                  <Link to="/executions" search={{ open: r.id }} className="block truncate p-2 font-medium text-primary hover:underline">
                     {r.job}
+                    <span className="block text-[11px] font-normal text-muted-foreground sm:hidden">{fmtRelative(r.startedAtMs, now)}</span>
                   </Link>
                 </TableCell>
                 <TableCell>
@@ -123,11 +124,11 @@ export function ExecutionsTable({
                     {r.status === "running" ? "en cours" : r.status === "interrupted" ? "interrompu" : r.status}
                   </span>
                 </TableCell>
-                <TableCell className="text-muted-foreground" title={new Date(r.startedAt).toLocaleString("fr-FR")}>
+                <TableCell className="hidden text-muted-foreground sm:table-cell" title={new Date(r.startedAt).toLocaleString("fr-FR")}>
                   {fmtRelative(r.startedAtMs, now)}
                 </TableCell>
                 <TableCell className="font-mono tabular-nums">{fmtDuration(r.durationMs)}</TableCell>
-                <TableCell className="max-w-md truncate text-muted-foreground" title={summarize(r)}>
+                <TableCell className="hidden max-w-md truncate text-muted-foreground md:table-cell" title={summarize(r)}>
                   {summarize(r)}
                 </TableCell>
               </TableRow>

@@ -47,10 +47,10 @@ export function ExecutionSheetContent({ record, workflows }: ExecutionSheetConte
   return (
     <>
       <SheetHeader className="gap-1.5 border-b border-border pr-12">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <StatusDot status={record.status} />
-          <SheetTitle className="text-sm">{record.job}</SheetTitle>
-          <div className="ml-auto flex items-center gap-1.5">
+          <SheetTitle className="min-w-0 truncate text-sm">{record.job}</SheetTitle>
+          <div className="flex w-full items-center gap-1.5 sm:ml-auto sm:w-auto">
             {canRetry && (
               <Button type="button" size="sm" variant="outline" disabled={retry.isPending} onClick={() => retry.mutate(record.id)}>
                 <RotateCw className={retry.isPending ? "animate-spin" : undefined} />

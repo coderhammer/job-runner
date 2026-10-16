@@ -75,8 +75,8 @@ export function TraceWaterfall({ job, spans, isLoading, onSelectSpan, selectedSp
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
           <span className="inline-flex items-center gap-1.5">
             <span className={cn("h-[9px] w-[9px] rounded-sm", KIND_SWATCH.job)} /> Job
           </span>
@@ -164,7 +164,7 @@ function Row({ node, depth, collapsedIds, onToggle, onSelect, selectedSpanId, tr
     <Fragment>
       <div
         className={cn(
-          "grid cursor-pointer grid-cols-[minmax(0,240px)_1fr_56px] items-center gap-2.5 rounded-md py-[3px] hover:bg-muted/60",
+          "grid cursor-pointer grid-cols-[minmax(0,130px)_1fr_48px] items-center gap-2 sm:grid-cols-[minmax(0,240px)_1fr_56px] sm:gap-2.5 rounded-md py-[3px] hover:bg-muted/60",
           node.id === selectedSpanId && "bg-primary/12 hover:bg-primary/12"
         )}
         onClick={() => onSelect(node)}
@@ -175,7 +175,7 @@ function Row({ node, depth, collapsedIds, onToggle, onSelect, selectedSpanId, tr
             depth === 0 ? "font-semibold" : "text-muted-foreground",
             node.status === "error" && "text-destructive"
           )}
-          style={{ paddingLeft: depth * 14 }}
+          style={{ paddingLeft: depth * 10 }}
         >
           <span
             className={cn("flex w-3.5 shrink-0 items-center justify-center text-muted-foreground/70", hasChildren && "cursor-pointer hover:text-primary")}

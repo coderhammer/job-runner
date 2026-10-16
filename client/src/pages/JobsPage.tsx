@@ -6,7 +6,7 @@ import { useRunningExecutions } from "../hooks/useRunningExecutions";
 import { useTriggerWorkflow } from "../hooks/useTriggerWorkflow";
 import { useNow } from "../hooks/useNow";
 import { runningForWorkflow, runsForWorkflow } from "../lib/workflowHealth";
-import { JobCard } from "../components/JobCard";
+import { JobsTable } from "../components/JobsTable";
 import { JobSheetContent } from "../components/JobSheetContent";
 
 export function JobsPage() {
@@ -39,17 +39,15 @@ export function JobsPage() {
         <p className="text-xs text-muted-foreground">Vue d'ensemble des workflows, de leur santé et de leur historique.</p>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {jobs.map((job) => (
-          <JobCard
-            key={job.id}
-            job={job}
-            runs={runsForWorkflow(stats, job.id)}
-            isRunning={runningForWorkflow(running, job.id).length > 0}
-            now={now}
-          />
-        ))}
-      </div>
+      <JobsTable
+        rows={jobs.map((job) => ({
+          job,
+          runs: runsForWorkflow(stats, job.id),
+          isRunning: runningForWorkflow(running, job.id).length > 0,
+        }))}
+        selectedJobId={selectedJob?.id ?? null}
+        now={now}
+      />
 
       <Sheet open={selectedJob !== null} onOpenChange={(open) => !open && closeSheet()}>
         <SheetContent className="gap-0 sm:max-w-xl">
