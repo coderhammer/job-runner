@@ -3,13 +3,16 @@ import { ChevronDown, ChevronRight, TriangleAlert } from "lucide-react";
 import type { JobRecord, SpanRecord } from "../types";
 import { fmtDuration } from "../lib/format";
 import { buildTree, countDescendants, expandAncestors, markLongestPath, spanKind, type SpanNode } from "../lib/waterfall";
-import { Button } from "./ui/button";
+import { Button, Spinner } from "@spunto/design-system";
 import { cn } from "@/lib/utils";
 
+// Couleur = nature du span (identité, pas statut), en tokens du design system Spunto.
+// Pas l'échelle build/ship/run seule : ses trois oranges sont trop proches pour
+// distinguer trois natures côte à côte — http passe donc sur `info` (bleu).
 const KIND_BAR: Record<string, string> = {
-  job: "bg-kind-job",
-  http: "bg-kind-http",
-  custom: "bg-kind-custom",
+  job: "bg-run",
+  http: "bg-info",
+  custom: "bg-build",
 };
 
 const KIND_SWATCH: Record<string, string> = KIND_BAR;
@@ -62,13 +65,18 @@ export function TraceWaterfall({ job, spans, isLoading, onSelectSpan, selectedSp
     });
   }
 
-  if (isLoading) return <div className="text-xs text-muted">chargement…</div>;
+  if (isLoading)
+    return (
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <Spinner /> chargement…
+      </div>
+    );
   if (!tree) return null;
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3 text-[11px] text-muted">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
           <span className="inline-flex items-center gap-1.5">
             <span className={cn("h-[9px] w-[9px] rounded-sm", KIND_SWATCH.job)} /> Job
           </span>
@@ -156,21 +164,21 @@ function Row({ node, depth, collapsedIds, onToggle, onSelect, selectedSpanId, tr
     <Fragment>
       <div
         className={cn(
-          "grid cursor-pointer grid-cols-[minmax(0,240px)_1fr_56px] items-center gap-2.5 rounded py-[3px] hover:bg-panel-2",
-          node.id === selectedSpanId && "bg-accent-soft hover:bg-accent-soft"
+          "grid cursor-pointer grid-cols-[minmax(0,130px)_1fr_48px] items-center gap-2 sm:grid-cols-[minmax(0,240px)_1fr_56px] sm:gap-2.5 rounded-md py-[3px] hover:bg-muted/60",
+          node.id === selectedSpanId && "bg-primary/12 hover:bg-primary/12"
         )}
         onClick={() => onSelect(node)}
       >
         <span
           className={cn(
             "flex items-center overflow-hidden text-ellipsis whitespace-nowrap text-xs",
-            depth === 0 ? "font-semibold" : "text-muted",
-            node.status === "error" && "text-error"
+            depth === 0 ? "font-semibold" : "text-muted-foreground",
+            node.status === "error" && "text-destructive"
           )}
-          style={{ paddingLeft: depth * 14 }}
+          style={{ paddingLeft: depth * 10 }}
         >
           <span
-            className={cn("flex w-3.5 shrink-0 items-center justify-center text-muted-2", hasChildren && "cursor-pointer hover:text-accent")}
+            className={cn("flex w-3.5 shrink-0 items-center justify-center text-muted-foreground/70", hasChildren && "cursor-pointer hover:text-primary")}
             onClick={(e) => {
               if (!hasChildren) return;
               e.stopPropagation();
@@ -179,36 +187,36 @@ function Row({ node, depth, collapsedIds, onToggle, onSelect, selectedSpanId, tr
           >
             {hasChildren ? (isCollapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />) : null}
           </span>
-          {node.status === "error" && <TriangleAlert className="mr-1 h-3 w-3 shrink-0 text-error" />}
+          {node.status === "error" && <TriangleAlert className="mr-1 h-3 w-3 shrink-0 text-destructive" />}
           {httpMethod && host ? (
             <>
               <span className="mr-1.5 font-semibold text-foreground">{String(httpMethod)}</span>
-              <span className="truncate text-muted">{String(host)}</span>
+              <span className="truncate text-muted-foreground">{String(host)}</span>
             </>
           ) : (
             <span className="truncate">{node.name}</span>
           )}
           {statusCode !== undefined && (
-            <span className={cn("ml-1.5 rounded px-1 text-[10px]", Number(statusCode) >= 400 ? "bg-error-soft text-error" : "bg-ok-soft text-ok")}>
+            <span className={cn("ml-1.5 rounded px-1 font-mono text-[10px]", Number(statusCode) >= 400 ? "bg-destructive/15 text-destructive" : "bg-success/15 text-success")}>
               {String(statusCode)}
             </span>
           )}
-          {isCollapsed && <span className="ml-1 text-muted-2">+{countDescendants(node)}</span>}
+          {isCollapsed && <span className="ml-1 text-muted-foreground/70">+{countDescendants(node)}</span>}
         </span>
-        <span className="relative h-[18px] rounded border border-border bg-panel-2">
+        <span className="relative h-[18px] rounded-md border border-border bg-muted/40">
           <span
             className={cn(
               "absolute top-[1px] bottom-[1px] min-w-[3px] rounded-sm transition-[filter]",
               KIND_BAR[kind],
-              node.status === "error" && "ring-2 ring-inset ring-error",
-              node.status === "running" && "animate-pulse-accent",
+              node.status === "error" && "ring-2 ring-inset ring-destructive",
+              node.status === "running" && "animate-pulse-primary",
               node.status === "interrupted" && "opacity-40 [background-image:repeating-linear-gradient(45deg,transparent,transparent_2px,rgba(0,0,0,0.25)_2px,rgba(0,0,0,0.25)_4px)]"
             )}
             style={{ left: `${offsetPct}%`, width: `${widthPct}%` }}
             title={tooltip}
           />
         </span>
-        <span className="text-right text-[11px] tabular-nums text-muted">{fmtDuration(liveDurationMs)}</span>
+        <span className="text-right font-mono text-[11px] tabular-nums text-muted-foreground">{fmtDuration(liveDurationMs)}</span>
       </div>
       {hasChildren && !isCollapsed && (
         <Rows

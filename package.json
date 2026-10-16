@@ -1,6 +1,6 @@
 {
   "name": "@hammerbot/job-runner",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Déclare des jobs (cron/webhook), obtiens télémétrie OpenTelemetry + dashboard. Extrait de coderhammer/automations.",
   "type": "module",
   "license": "MIT",
@@ -54,7 +54,8 @@
     "node-cron": "^3.0.3"
   },
   "devDependencies": {
-    "@radix-ui/react-dialog": "^1.1.18",
+    "@base-ui/react": "^1.9.0",
+    "@spunto/design-system": "^0.46.0",
     "@tailwindcss/vite": "^4.3.2",
     "@tanstack/react-query": "^5.101.2",
     "@tanstack/react-router": "^1.170.17",
@@ -65,12 +66,9 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.3",
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
     "lucide-react": "^1.23.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "tailwind-merge": "^3.6.0",
     "tailwindcss": "^4.3.2",
     "typescript": "^5.5.4",
     "vite": "^8.1.3"

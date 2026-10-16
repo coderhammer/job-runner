@@ -7,8 +7,8 @@ import { useRetryExecution } from "../hooks/useRetryExecution";
 import { fmtDuration } from "../lib/format";
 import { resolveJobForExecution } from "../lib/workflowHealth";
 import type { SpanNode } from "../lib/waterfall";
-import { Button, buttonVariants } from "./ui/button";
-import { SheetBody, SheetDescription, SheetHeader, SheetTitle } from "./ui/sheet";
+import { Alert, AlertDescription, Button, buttonVariants, SheetDescription, SheetHeader, SheetTitle } from "@spunto/design-system";
+import { RotateCw } from "lucide-react";
 import { StatusDot } from "./ui/status-dot";
 import { TraceWaterfall } from "./TraceWaterfall";
 import { cn } from "@/lib/utils";
@@ -19,10 +19,10 @@ interface ExecutionSheetContentProps {
 }
 
 const LOG_COLOR: Record<LogLine["level"], string> = {
-  log: "text-muted",
-  info: "text-accent",
+  log: "text-muted-foreground",
+  info: "text-info",
   warn: "text-warning",
-  error: "text-error",
+  error: "text-destructive",
 };
 
 export function ExecutionSheetContent({ record, workflows }: ExecutionSheetContentProps) {
@@ -46,14 +46,15 @@ export function ExecutionSheetContent({ record, workflows }: ExecutionSheetConte
 
   return (
     <>
-      <SheetHeader>
-        <div className="flex items-center gap-2">
+      <SheetHeader className="gap-1.5 border-b border-border pr-12">
+        <div className="flex flex-wrap items-center gap-2">
           <StatusDot status={record.status} />
-          <SheetTitle>{record.job}</SheetTitle>
-          <div className="ml-auto flex items-center gap-1.5">
+          <SheetTitle className="min-w-0 truncate text-sm">{record.job}</SheetTitle>
+          <div className="flex w-full items-center gap-1.5 sm:ml-auto sm:w-auto">
             {canRetry && (
               <Button type="button" size="sm" variant="outline" disabled={retry.isPending} onClick={() => retry.mutate(record.id)}>
-                {retry.isPending ? "Relance…" : "↻ Relancer"}
+                <RotateCw className={retry.isPending ? "animate-spin" : undefined} />
+                {retry.isPending ? "Relance…" : "Relancer"}
               </Button>
             )}
             {job && (
@@ -63,20 +64,24 @@ export function ExecutionSheetContent({ record, workflows }: ExecutionSheetConte
             )}
           </div>
         </div>
-        <SheetDescription className={isRunning ? "text-accent" : undefined}>
+        <SheetDescription className={cn("text-xs", isRunning && "text-primary")}>
           {new Date(record.startedAt).toLocaleString("fr-FR")} · {durationLabel}
         </SheetDescription>
       </SheetHeader>
-      <SheetBody className="flex flex-col gap-5">
+      <div className="flex flex-1 flex-col gap-5 overflow-y-auto p-4">
         {isRunning && (
-          <div className="rounded-md border border-accent/40 bg-accent-soft px-3 py-2 text-[11px] text-accent">
-            Ce job tourne encore — le waterfall se complète au fur et à mesure que ses étapes se terminent.
-          </div>
+          <Alert variant="info">
+            <AlertDescription className="text-xs">
+              Ce job tourne encore — le waterfall se complète au fur et à mesure que ses étapes se terminent.
+            </AlertDescription>
+          </Alert>
         )}
         {record.status === "interrupted" && (
-          <div className="rounded-md border border-warning/40 bg-warning-soft px-3 py-2 text-[11px] text-warning">
-            {record.statusMessage || "Processus arrêté avant la fin (redémarrage ou crash)."}
-          </div>
+          <Alert variant="warning">
+            <AlertDescription className="text-xs">
+              {record.statusMessage || "Processus arrêté avant la fin (redémarrage ou crash)."}
+            </AlertDescription>
+          </Alert>
         )}
 
         <TraceWaterfall
@@ -90,8 +95,8 @@ export function ExecutionSheetContent({ record, workflows }: ExecutionSheetConte
 
         {activeError && (
           <div className="flex flex-col gap-1.5">
-            <div className="text-[11px] font-medium uppercase tracking-wide text-error">Erreur — {activeName}</div>
-            <pre className="overflow-x-auto whitespace-pre-wrap break-words rounded-md border border-error bg-error-soft p-3 text-[11px] text-error">
+            <div className="text-[11px] font-medium uppercase tracking-wide text-destructive">Erreur — {activeName}</div>
+            <pre className="overflow-x-auto whitespace-pre-wrap break-words rounded-lg border border-destructive/40 bg-destructive/10 p-3 font-mono text-[11px] text-destructive">
               {`${activeError.type || "Error"}: ${activeError.message || "(pas de message)"}\n\n${activeError.stacktrace || "(pas de stacktrace)"}`}
             </pre>
           </div>
@@ -99,10 +104,10 @@ export function ExecutionSheetContent({ record, workflows }: ExecutionSheetConte
 
         {activeLogs.length > 0 && (
           <div className="flex flex-col gap-1.5">
-            <div className="text-[11px] font-medium uppercase tracking-wide text-muted-2">Logs — {activeName}</div>
-            <div className="flex max-h-60 flex-col gap-0.5 overflow-y-auto rounded-md border border-border bg-panel-2 p-3">
+            <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Logs — {activeName}</div>
+            <div className="flex max-h-60 flex-col gap-0.5 overflow-y-auto rounded-lg border border-border bg-code-surface p-3">
               {activeLogs.map((l, i) => (
-                <pre key={i} className={cn("whitespace-pre-wrap break-words text-[11px]", LOG_COLOR[l.level])}>
+                <pre key={i} className={cn("whitespace-pre-wrap break-words font-mono text-[11px]", LOG_COLOR[l.level])}>
                   [{l.level}] {l.message}
                 </pre>
               ))}
@@ -111,14 +116,14 @@ export function ExecutionSheetContent({ record, workflows }: ExecutionSheetConte
         )}
 
         <div className="flex flex-col gap-1.5">
-          <div className="text-[11px] font-medium uppercase tracking-wide text-muted-2">
+          <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
             Attributs {selectedSpan ? "" : isRunning ? "(au démarrage)" : ""}
           </div>
-          <pre className="overflow-x-auto whitespace-pre-wrap break-words rounded-md border border-border bg-panel-2 p-3 text-[11px] text-muted">
+          <pre className="overflow-x-auto whitespace-pre-wrap break-words rounded-lg border border-border bg-card p-3 font-mono text-[11px] text-muted-foreground">
             {JSON.stringify(activeAttributes || {}, null, 2)}
           </pre>
         </div>
-      </SheetBody>
+      </div>
     </>
   );
 }

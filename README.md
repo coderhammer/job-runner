@@ -111,5 +111,12 @@ manuel possible aussi : `npm publish --access public` avec un token équivalent.
 
 ## Développer le dashboard
 
+L'UI est construite sur le design system Spunto ([`@spunto/design-system`](https://design.spunto.net)) :
+tokens/polices importés dans `client/src/index.css`, primitives (`Button`, `Card`, `Sheet`,
+`Table`, `Select`, `Alert`…) importées directement depuis le paquet — pas de copie locale
+dans `client/src/components/ui/` (n'y restent que `StatusDot` et le raccourci `OptionSelect`).
+Thème sombre via la classe `dark` sur `<html>`. Le paquet est une devDependency : il est
+compilé dans `dist/client` au build, un consommateur ne l'installe jamais.
+
 `npm run dev:client` lance Vite (HMR) en proxifiant `/api` vers un serveur consommateur
 tournant sur `:3000`. `npm run build` régénère `dist/` (tsc + Vite + migrations).
