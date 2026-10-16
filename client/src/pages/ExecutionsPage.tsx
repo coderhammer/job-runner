@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useNavigate, useSearch } from "@tanstack/react-router";
+import { Button, Sheet, SheetContent, SheetHeader, SheetTitle, Spinner } from "@spunto/design-system";
 import { useExecutions } from "../hooks/useExecutions";
 import { useExecutionsInfinite } from "../hooks/useExecutionsInfinite";
 import { useExecution } from "../hooks/useExecution";
@@ -9,8 +10,6 @@ import { summarize } from "../lib/format";
 import type { JobRecord } from "../types";
 import { ExecutionsTable, type ExecutionRow, type StatusFilter } from "../components/ExecutionsTable";
 import { ExecutionSheetContent } from "../components/ExecutionSheetContent";
-import { Button } from "../components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../components/ui/sheet";
 
 function toRow(record: JobRecord, now: number): ExecutionRow {
   return {
@@ -68,8 +67,8 @@ export function ExecutionsPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-lg font-semibold">Executions</h1>
-        <p className="text-xs text-muted">Historique complet des exécutions, filtrable par job et par statut.</p>
+        <h1 className="font-display text-xl font-bold">Executions</h1>
+        <p className="text-xs text-muted-foreground">Historique complet des exécutions, filtrable par job et par statut.</p>
       </div>
 
       <ExecutionsTable
@@ -94,12 +93,14 @@ export function ExecutionsPage() {
       )}
 
       <Sheet open={openId !== null} onOpenChange={(open) => !open && closeSheet()}>
-        <SheetContent className="max-w-2xl">
+        <SheetContent className="gap-0 sm:max-w-2xl">
           {executionQuery.data ? (
             <ExecutionSheetContent record={executionQuery.data} workflows={workflowsQuery.data ?? []} />
           ) : (
-            <SheetHeader>
-              <SheetTitle>Chargement…</SheetTitle>
+            <SheetHeader className="border-b border-border">
+              <SheetTitle className="flex items-center gap-2">
+                <Spinner /> Chargement…
+              </SheetTitle>
             </SheetHeader>
           )}
         </SheetContent>

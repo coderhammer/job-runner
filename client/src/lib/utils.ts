@@ -1,6 +1,2 @@
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
-
-export function cn(...inputs: ClassValue[]): string {
-  return twMerge(clsx(inputs));
-}
+// `cn` (clsx + tailwind-merge) vient du design system Spunto, configuré pour ses tokens.
+export { cn } from "@spunto/design-system";

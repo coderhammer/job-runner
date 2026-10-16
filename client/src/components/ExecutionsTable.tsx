@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { fmtDuration, fmtRelative, summarize } from "../lib/format";
 import { cn } from "@/lib/utils";
-import { Input } from "./ui/input";
-import { Select } from "./ui/select";
+import { Input, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@spunto/design-system";
+import { OptionSelect } from "./ui/option-select";
 import { StatusDot } from "./ui/status-dot";
 
 export type StatusFilter = "" | "ok" | "error" | "interrupted";
@@ -61,25 +61,24 @@ export function ExecutionsTable({
           placeholder="Rechercher un job, un attribut…"
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="min-w-[200px] max-w-xs flex-1"
+          className="min-w-[200px] max-w-xs flex-1 text-xs"
         />
-        <Select value={jobFilter} onChange={(e) => onJobFilterChange(e.target.value)}>
-          <option value="">Tous les jobs</option>
-          {knownJobs.map((j) => (
-            <option key={j} value={j}>
-              {j}
-            </option>
-          ))}
-        </Select>
-        <div className="inline-flex gap-0.5 rounded-md border border-border bg-panel p-0.5">
+        <OptionSelect
+          aria-label="Filtrer par job"
+          value={jobFilter}
+          onValueChange={onJobFilterChange}
+          options={[{ value: "", label: "Tous les jobs" }, ...knownJobs.map((j) => ({ value: j, label: j }))]}
+          className="w-auto min-w-[160px]"
+        />
+        <div className="inline-flex gap-0.5 rounded-lg border border-border bg-card p-0.5">
           {STATUS_PILLS.map((p) => (
             <button
               key={p.value || "all"}
               type="button"
               onClick={() => onStatusFilterChange(p.value)}
               className={cn(
-                "rounded px-2.5 py-1 text-xs text-muted transition-colors hover:text-foreground",
-                statusFilter === p.value && "bg-panel-2 text-foreground"
+                "rounded-md px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground",
+                statusFilter === p.value && "bg-muted text-foreground"
               )}
             >
               {p.label}
@@ -88,58 +87,54 @@ export function ExecutionsTable({
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-lg border border-border">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="border-b border-border text-left text-[11px] uppercase tracking-wide text-muted-2">
-              <th className="px-3 py-2 font-medium">Job</th>
-              <th className="px-3 py-2 font-medium">Statut</th>
-              <th className="px-3 py-2 font-medium">Démarré</th>
-              <th className="px-3 py-2 font-medium">Durée</th>
-              <th className="px-3 py-2 font-medium">Résumé</th>
-            </tr>
-          </thead>
-          <tbody>
+      <div className="overflow-hidden rounded-lg border border-border bg-card">
+        <Table className="text-xs">
+          <TableHeader>
+            <TableRow className="text-[11px] uppercase tracking-wide">
+              <TableHead>Job</TableHead>
+              <TableHead>Statut</TableHead>
+              <TableHead>Démarré</TableHead>
+              <TableHead>Durée</TableHead>
+              <TableHead>Résumé</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {records.map((r) => (
-              <tr key={r.id} className={cn("border-b border-border last:border-0", r.id === selectedRecordId && "bg-accent-soft")}>
-                <td className="p-0">
-                  <Link
-                    to="/executions"
-                    search={{ open: r.id }}
-                    className="block px-3 py-2 text-xs font-medium text-accent hover:underline"
-                  >
+              <TableRow key={r.id} data-state={r.id === selectedRecordId ? "selected" : undefined}>
+                <TableCell className="p-0">
+                  <Link to="/executions" search={{ open: r.id }} className="block p-2 font-medium text-primary hover:underline">
                     {r.job}
                   </Link>
-                </td>
-                <td className="px-3 py-2">
+                </TableCell>
+                <TableCell>
                   <span
                     className={cn(
-                      "inline-flex items-center gap-1.5 text-xs",
+                      "inline-flex items-center gap-1.5",
                       r.status === "ok"
-                        ? "text-ok"
+                        ? "text-success"
                         : r.status === "error"
-                          ? "text-error"
+                          ? "text-destructive"
                           : r.status === "interrupted"
                             ? "text-warning"
-                            : "text-accent"
+                            : "text-primary"
                     )}
                   >
                     <StatusDot status={r.status} />
                     {r.status === "running" ? "en cours" : r.status === "interrupted" ? "interrompu" : r.status}
                   </span>
-                </td>
-                <td className="px-3 py-2 text-xs text-muted" title={new Date(r.startedAt).toLocaleString("fr-FR")}>
+                </TableCell>
+                <TableCell className="text-muted-foreground" title={new Date(r.startedAt).toLocaleString("fr-FR")}>
                   {fmtRelative(r.startedAtMs, now)}
-                </td>
-                <td className="px-3 py-2 text-xs tabular-nums text-foreground">{fmtDuration(r.durationMs)}</td>
-                <td className="max-w-md truncate px-3 py-2 text-xs text-muted" title={summarize(r)}>
+                </TableCell>
+                <TableCell className="font-mono tabular-nums">{fmtDuration(r.durationMs)}</TableCell>
+                <TableCell className="max-w-md truncate text-muted-foreground" title={summarize(r)}>
                   {summarize(r)}
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
-        {records.length === 0 && <div className="px-3 py-6 text-center text-xs text-muted-2">Aucune exécution pour l'instant.</div>}
+          </TableBody>
+        </Table>
+        {records.length === 0 && <div className="px-3 py-6 text-center text-xs text-muted-foreground">Aucune exécution pour l'instant.</div>}
       </div>
     </div>
   );

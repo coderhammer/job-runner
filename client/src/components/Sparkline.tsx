@@ -27,9 +27,9 @@ export function Sparkline({ durations, className }: SparklineProps) {
     <svg className={className ?? "h-6 w-[90px] shrink-0"} viewBox="0 0 90 24" preserveAspectRatio="none">
       <polyline
         points={points}
-        style={{ fill: "none", stroke: "var(--color-muted-2)", strokeWidth: 1.6, strokeLinejoin: "round", strokeLinecap: "round" }}
+        style={{ fill: "none", stroke: "var(--muted-foreground)", strokeWidth: 1.6, strokeLinejoin: "round", strokeLinecap: "round" }}
       />
-      <circle cx={lx} cy={ly} r={2.2} style={{ fill: "var(--color-accent)" }} />
+      <circle cx={lx} cy={ly} r={2.2} style={{ fill: "var(--primary)" }} />
     </svg>
   );
 }

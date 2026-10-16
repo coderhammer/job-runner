@@ -1,107 +1,48 @@
 @import "tailwindcss";
+/* Tokens, polices (Geist / JetBrains Mono / Syne) et mapping Tailwind du design
+   system Spunto. Le paquet livre ses sources TS : @source pour que Tailwind
+   génère aussi les classes utilisées par ses composants. */
+@import "@spunto/design-system/styles.css";
+@source "../../node_modules/@spunto/design-system/src";
+@custom-variant dark (&:is(.dark *));
 
-/* Palette validée (ΔE mini 41 sur fond --color-background) — voir
-   scripts/validate_palette.js. Ne pas changer ces teintes sans revalider. */
+/* Seuls ajouts propres au dashboard : les pulsations des pastilles de statut
+   (vert = rafraîchissement live actif, flame = job en cours). Toutes les
+   couleurs viennent des tokens du DS (success / destructive / warning / primary,
+   build / ship / run pour la nature des spans). */
 @theme {
-  --color-background: #0d0d0d;
-  --color-panel: #15171a;
-  --color-panel-2: #1c1f24;
-  --color-border: #2c2c2a;
-  --color-ring: rgba(255, 255, 255, 0.1);
-  --color-foreground: #ffffff;
-  --color-muted: #c3c2b7;
-  --color-muted-2: #898781;
-
-  --color-ok: #0ca30c;
-  --color-ok-soft: rgba(12, 163, 12, 0.16);
-  --color-error: #d03b3b;
-  --color-error-soft: rgba(208, 59, 59, 0.16);
-  --color-accent: #3987e5;
-  --color-accent-soft: rgba(57, 135, 229, 0.16);
-
-  /* Statut "interrompu" (process arrêté avant la fin d'un span, ex: crash/redémarrage) —
-     distinct de --color-kind-custom qui partage la même teinte mais un concept différent
-     (nature du span dans le waterfall, pas statut d'exécution). */
-  --color-warning: #c98500;
-  --color-warning-soft: rgba(201, 133, 0, 0.16);
-
-  /* Couleur par type de span dans le waterfall — identité, pas statut (le
-     statut ok/erreur reste porté séparément par l'anneau + l'icône, jamais
-     par cette teinte). */
-  --color-kind-job: #3987e5;
-  --color-kind-http: #199e70;
-  --color-kind-custom: #c98500;
-
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-
-  --animate-sheet-in: sheet-in 220ms cubic-bezier(0.16, 1, 0.3, 1);
-  --animate-sheet-out: sheet-out 180ms ease-in;
-  --animate-overlay-in: overlay-in 180ms ease-out;
-  --animate-overlay-out: overlay-out 150ms ease-in;
   --animate-pulse-ok: pulse-ok 2s infinite;
-  --animate-pulse-accent: pulse-accent 1.3s infinite;
+  --animate-pulse-primary: pulse-primary 1.3s infinite;
 
-  @keyframes sheet-in {
-    from {
-      transform: translateX(100%);
-    }
-    to {
-      transform: translateX(0);
-    }
-  }
-  @keyframes sheet-out {
-    from {
-      transform: translateX(0);
-    }
-    to {
-      transform: translateX(100%);
-    }
-  }
-  @keyframes overlay-in {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-  @keyframes overlay-out {
-    from {
-      opacity: 1;
-    }
-    to {
-      opacity: 0;
-    }
-  }
   @keyframes pulse-ok {
     0% {
-      box-shadow: 0 0 0 0 rgba(12, 163, 12, 0.55);
+      box-shadow: 0 0 0 0 oklch(0.72 0.15 154 / 0.55);
     }
     70% {
-      box-shadow: 0 0 0 6px rgba(12, 163, 12, 0);
+      box-shadow: 0 0 0 6px oklch(0.72 0.15 154 / 0);
     }
     100% {
-      box-shadow: 0 0 0 0 rgba(12, 163, 12, 0);
+      box-shadow: 0 0 0 0 oklch(0.72 0.15 154 / 0);
     }
   }
-  @keyframes pulse-accent {
+  @keyframes pulse-primary {
     0% {
-      box-shadow: 0 0 0 0 rgba(57, 135, 229, 0.55);
+      box-shadow: 0 0 0 0 oklch(0.70 0.2 43 / 0.55);
     }
     70% {
-      box-shadow: 0 0 0 6px rgba(57, 135, 229, 0);
+      box-shadow: 0 0 0 6px oklch(0.70 0.2 43 / 0);
     }
     100% {
-      box-shadow: 0 0 0 0 rgba(57, 135, 229, 0);
+      box-shadow: 0 0 0 0 oklch(0.70 0.2 43 / 0);
     }
   }
 }
 
 @layer base {
   * {
-    border-color: var(--color-border);
+    @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-mono text-[13px] antialiased;
+    @apply bg-background font-sans text-[13px] text-foreground antialiased;
   }
 }

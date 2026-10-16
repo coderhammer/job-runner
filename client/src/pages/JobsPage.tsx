@@ -1,4 +1,5 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
+import { Sheet, SheetContent } from "@spunto/design-system";
 import { useWorkflows } from "../hooks/useWorkflows";
 import { useExecutions } from "../hooks/useExecutions";
 import { useRunningExecutions } from "../hooks/useRunningExecutions";
@@ -7,7 +8,6 @@ import { useNow } from "../hooks/useNow";
 import { runningForWorkflow, runsForWorkflow } from "../lib/workflowHealth";
 import { JobCard } from "../components/JobCard";
 import { JobSheetContent } from "../components/JobSheetContent";
-import { Sheet, SheetContent } from "../components/ui/sheet";
 
 export function JobsPage() {
   const now = useNow();
@@ -35,8 +35,8 @@ export function JobsPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-lg font-semibold">Jobs</h1>
-        <p className="text-xs text-muted">Vue d'ensemble des workflows, de leur santé et de leur historique.</p>
+        <h1 className="font-display text-xl font-bold">Jobs</h1>
+        <p className="text-xs text-muted-foreground">Vue d'ensemble des workflows, de leur santé et de leur historique.</p>
       </div>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -52,7 +52,7 @@ export function JobsPage() {
       </div>
 
       <Sheet open={selectedJob !== null} onOpenChange={(open) => !open && closeSheet()}>
-        <SheetContent>
+        <SheetContent className="gap-0 sm:max-w-xl">
           {selectedJob && (
             <JobSheetContent
               job={selectedJob}
