@@ -104,10 +104,10 @@ consommateur** — un `npm ci` suffit.
 
 ### Publier une nouvelle version
 
-Bump `version` dans `package.json`, puis créer une **GitHub Release** : la CI
-(`.github/workflows/release.yml`) publie sur npm (nécessite le secret repo `NPM_TOKEN`,
-un token granulaire *bypass 2FA* — expiration npm max 90 jours, à faire tourner). Publish
-manuel possible aussi : `npm publish --access public` avec un token équivalent.
+Bumper `version` dans `package.json` dans la PR : au merge sur `main`, la CI
+(`.github/workflows/publish.yml`) publie sur npm si cette version n'existe pas encore
+(sinon no-op). Auth par **npm Trusted Publishing** (OIDC) — pas de token à faire
+tourner ; réglage unique côté npmjs.com décrit en tête du workflow.
 
 ## Développer le dashboard
 

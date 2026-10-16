@@ -1,0 +1,55 @@
+name: publish
+
+# Publie @hammerbot/job-runner sur npm à chaque push sur main dont la version de
+# package.json n'existe pas encore sur le registre : pour sortir une version, bumper
+# `version` dans la PR — un push sans bump est un no-op vert. Calqué sur
+# publish-design-system.yml du repo spunto.
+#
+# **main uniquement** (cf. le `if` du job) : le Trusted Publishing npm épingle le
+# *nom du fichier* de workflow, pas la ref — un workflow_dispatch depuis une branche
+# publierait sinon le code non mergé de cette branche sous sa version.
+#
+# Auth : npm **Trusted Publishing** (OIDC), pas de secret NPM_TOKEN. Réglage unique sur
+# npmjs.com → paquet @hammerbot/job-runner → Settings → Trusted Publisher :
+#   - Organization or user : coderhammer
+#   - Repository :           job-runner
+#   - Workflow filename :    publish.yml
+# Nécessite npm >= 11.5.1 et Node >= 22.14. La provenance est attachée automatiquement.
+#
+# Le build (dist/ : serveur compilé + dashboard Vite + migrations) est régénéré par
+# le script `prepack` au moment du publish.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      id-token: write # Trusted Publishing (OIDC)
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: "https://registry.npmjs.org"
+
+      - name: npm compatible Trusted Publishing
+        run: npm install -g npm@latest
+
+      - run: npm ci
+
+      - name: Publier si la version est nouvelle
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          if npm view "@hammerbot/job-runner@${VERSION}" version >/dev/null 2>&1; then
+            echo "@hammerbot/job-runner@${VERSION} déjà publié — rien à faire."
+          else
+            echo "Publication de @hammerbot/job-runner@${VERSION} (Trusted Publishing OIDC)…"
+            npm publish --access public
+          fi
