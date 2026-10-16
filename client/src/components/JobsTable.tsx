@@ -38,7 +38,7 @@ export function JobsTable({ rows, selectedJobId, now }: JobsTableProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {rows.map(({ job, runs, isRunning }) => {
+          {sortByLastRun(rows).map(({ job, runs, isRunning }) => {
             const last = runs[runs.length - 1];
             const status: Status = isRunning ? "running" : last ? last.status : "idle";
             const successRate = job.stats.successRate;
@@ -113,6 +113,14 @@ export function JobsTable({ rows, selectedJobId, now }: JobsTableProps) {
       {rows.length === 0 && <div className="px-3 py-6 text-center text-xs text-muted-foreground">Aucun workflow déclaré.</div>}
     </div>
   );
+}
+
+// Tri par défaut : dernière exécution la plus récente en haut. Un job en cours compte
+// comme « maintenant » ; les jamais-exécutés ferment la marche, dans l'ordre du manifest
+// (le tri de Array.prototype.sort est stable).
+function sortByLastRun(rows: JobRow[]): JobRow[] {
+  const key = (r: JobRow) => (r.isRunning ? Infinity : (r.runs[r.runs.length - 1]?.startedAtMs ?? -Infinity));
+  return [...rows].sort((a, b) => (key(a) === key(b) ? 0 : key(b) > key(a) ? 1 : -1));
 }
 
 function triggerLabel(job: WorkflowDefinition): string {
